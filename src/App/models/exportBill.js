@@ -6,7 +6,7 @@ const ExportBill = Schema({
     itemId:{type: String},
     number:{type:Number,default:0},
     price:{type:Number,default:0},
-    
+    name:{type:String},
     createdAt:{type:Date,default:Date.now}
 })
 

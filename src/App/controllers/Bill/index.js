@@ -7,9 +7,9 @@ const exportBill = require('../../models/exportBill')
 class BillClass{
     async create(req, res, next) {
         try {
-            const {billId,provider,date=Date.now,itemId,name,number,price} = req.body
+            const {billId,provider,date=Date.now,listProduct} = req.body
             let bill
-            if(!billId || !provider || !itemId)
+            if(!billId || !provider)
                 return res.status(401).json({
                     success: false,
                     message: 'dont enough information',
@@ -18,25 +18,36 @@ class BillClass{
             const newDate = new Date(date).toISOString().substring(0,10)
             const checkBill = await Bill.findOne({billId})
 
-            if(checkBill && checkBill.date !==newDate){
+            if(checkBill){
                 return res.status(200).json({
                     success:false,
                     message: 'Mã đã tồn tại',
                     code:11000
                 })
-            }else if(!checkBill){
+            }else{
                 bill =  Bill.create({billId,provider,date:newDate})
+                
             }
-            const inventory =  await Inventory.updateOne({billId:billId,itemId:itemId,name,price},{$inc:{number:number}},{upsert:true})
-            const specifyBill =  SpecifyBill.updateOne({billId,itemId,name,price},{$inc:{number:number,recentNumber:number}},{upsert:true})
-            const product = await Product.updateOne({billId,itemId},{$inc:{number:number}})
-            const [billData, specificationData] = await Promise.all([bill,specifyBill])
-            if(specificationData) return res.status(200).json({
+            const arrPromise =[]
+            for(let i = 0;i<listProduct.length;i++){
+                const item = listProduct[i]
+                const inventory =   Inventory.updateOne({billId:billId,itemId:item.codeItem,name:item.name,price:item.price},{$inc:{number:item.number}},{upsert:true})
+                const specifyBill =  SpecifyBill.updateOne({billId,itemId:item.codeItem,name:item.name,price:item.price},{$inc:{number:item.number,recentNumber:item.number}},{upsert:true})
+                const product =  Product.updateOne({billId,itemId:item.codeItem},{$inc:{number:item.number}})
+                arrPromise.push(inventory)
+                arrPromise.push(specifyBill)
+                arrPromise.push(product)
+            }
+
+            arrPromise.push(bill)
+
+            const data = await Promise.all(arrPromise)
+            
+            if(data) return res.status(200).json({
                 success: true,
                 message: 'create bill successfully',
                 data:{
-                    billData,
-                    specificationData
+                    data
                 }
             })
             return res.status(403).json({

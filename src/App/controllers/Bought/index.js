@@ -78,10 +78,10 @@ class BoughtController {
        try {
             const id = req.body.idBought
             const status = req.body.status
-            const {billId,itemId,number,price} = req.body
+            const {billId,itemId,number,price,name} = req.body
             const data = await Bought.updateOne({_id:id},{$set:{code:status}})
             if(status==='success'){
-                await exportBill.updateOne({billId,itemId,price},{$inc:{number:number}},{upsert:true})
+                await exportBill.updateOne({billId,itemId,price,name},{$inc:{number:number}},{upsert:true})
                 await Inventory.updateOne({billId,itemId},{$inc:{number:-number}})
             }
             res.status(200).json({
@@ -178,7 +178,7 @@ class BoughtController {
             const newBoughtAtStore = new BoughtAtStore({idProduct,nameProduct,name,phoneNumber,address,price,number})
             const data = await newBoughtAtStore.save()
             await Product.updateOne({_id:idProduct},{$inc:{number:-number}})
-            await exportBill.updateOne({billId,itemId,price},{$inc:{number:number}},{upsert:true})
+            await exportBill.updateOne({billId,itemId,price,name},{$inc:{number:number}},{upsert:true})
             await Inventory.updateOne({billId,itemId},{$inc:{number:-number}})
             res.status(200).json({
                 title:'bought at store',

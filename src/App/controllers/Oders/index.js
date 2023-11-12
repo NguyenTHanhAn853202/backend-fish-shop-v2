@@ -112,7 +112,7 @@ class OderController {
         const id = isValidID(req.body.idOrder)
         const idInfoOrder = req.body.idInfoOrder
         const orderCode = req.body.orderCode
-        const {billId,itemId,ship} = req.body
+        const {billId,itemId,ship,name} = req.body
         let dataSave = ''
         if(id) {
             const data = await OrderSchema.findOne({_id:id})
@@ -127,7 +127,7 @@ class OderController {
                 await bought.save()
                 dataSave = await data.save();
                 if(ship){
-                    await exportBill.updateOne({billId,itemId,price:boughtData.price},{$inc:{number:boughtData.number}},{upsert:true})
+                    await exportBill.updateOne({billId,itemId,price:boughtData.price,name},{$inc:{number:boughtData.number}},{upsert:true})
                     await Inventory.updateOne({billId,itemId},{$inc:{number:-boughtData.number}})
                 }
                 if(i===1) dataSave = await OrderSchema.deleteOne({_id:id})

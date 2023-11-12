@@ -76,12 +76,12 @@ class ProductController {
             const {size,price,number,name,description,type,billId,itemId} = req.body
             // console.log(size +" " + price + " " + number + " " + description+" "+name+" " +type);
             const image = []
-
+            console.log('size: ' + size);
             const sizeArr = size.split(',')
 
             files.forEach((file) => {
                 image.push(`http://${serverName}:${serverPort}/product/open-image?image=${file?.filename}`)
-             })
+            })
    
             const data  = new Product({size:sizeArr,price,number,image,name,description,type,billId,itemId})
             await data.save()
@@ -112,7 +112,7 @@ class ProductController {
     async modify(req, res) {
         try {
             const files = req.files
-            const  {size,price,number,name,description,type,idProduct,fileUpdate} = req.body
+            const  {size,price,description,type,idProduct,fileUpdate} = req.body
             let image = []  
             const sizeArr = size.split(',')
             files.forEach((file) => {
@@ -123,7 +123,7 @@ class ProductController {
                     image = [...image,...fileUpdate]
                 }else image=[...image,fileUpdate]
             }
-            const data = await Product.updateOne({_id:idProduct},{size:sizeArr,price,number,name,description,type,image})
+            const data = await Product.updateOne({_id:idProduct},{size:sizeArr,price,description,type,image})
             return res.status(200).json({
                 title:'update-product',
                 success:true,
