@@ -7,7 +7,6 @@ const exportBill = require('../../models/exportBill')
 const Inventory = require('../../models/Inventory')
 const limit = 10
 class OderController {
-    
     // saving user's information bought
     async create(req,res,next) {
        try {

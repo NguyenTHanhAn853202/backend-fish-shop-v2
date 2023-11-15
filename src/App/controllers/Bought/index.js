@@ -131,26 +131,22 @@ class BoughtController {
         let promises = []
         
         if (data.length > 0){
-             promises = data.map(async (item) => {
-                if(item.code ==='success'){
+            promises = data.map(async (item) => {
+                if(item.code  && item.code !=='error'){
                     const key = sortMonth(item.createdAt);
                     if (!listMonth[key]) {
-                        listMonth[key] = [];
+                        listMonth[key] = 0;
                     }
-            
                     listMonth[key] = ((listMonth[key]) + item.price*item.number)*1;
                 }
-                else{
-                    const isDelivered =  await checkDelivered(item.code);
-                    if (isDelivered) {
-                        const key = sortMonth(item.createdAt);
-                        if (!listMonth[key]) {
-                        listMonth[key] = [];
-                        }
-                
-                        listMonth[key] = ((listMonth[key]) + item.price*item.number)*1;
-                    }
-                }
+                // else{
+                //     // const isDelivered =  await checkDelivered(item.code);                 
+                //         const key = sortMonth(item.createdAt);
+                //         if (!listMonth[key]) {
+                //         listMonth[key] = [];
+                //         }
+                //         listMonth[key] = ((listMonth[key]) + item.price*item.number)*1;
+                // }
             });
             
           }
@@ -178,7 +174,7 @@ class BoughtController {
             const newBoughtAtStore = new BoughtAtStore({idProduct,nameProduct,name,phoneNumber,address,price,number})
             const data = await newBoughtAtStore.save()
             await Product.updateOne({_id:idProduct},{$inc:{number:-number}})
-            await exportBill.updateOne({billId,itemId,price,name},{$inc:{number:number}},{upsert:true})
+            await exportBill.updateOne({billId,itemId,price,name:nameProduct},{$inc:{number:number}},{upsert:true})
             await Inventory.updateOne({billId,itemId},{$inc:{number:-number}})
             res.status(200).json({
                 title:'bought at store',
