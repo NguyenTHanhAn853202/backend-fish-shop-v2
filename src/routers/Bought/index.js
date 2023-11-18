@@ -17,5 +17,11 @@ router.post('/bought-at-store',Bought.boughtAtStore)
 // statistic
 
 router.get('/overview',Statistics.overView)
+router.get('/product',Statistics.product)
+router.get('/price-each-years',Statistics.saleInYears)
+router.get('/order',Statistics.order)
+router.get('/user',Statistics.user)
+router.get('/provider',Statistics.provider)
+
 
 module.exports = router

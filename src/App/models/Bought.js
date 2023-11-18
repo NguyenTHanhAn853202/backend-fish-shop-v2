@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const BoughtSchema = new Schema(
     {
-        userID: {type: mongoose.Schema.ObjectId, required: true, ref:'Account'},
+        userID: {type: mongoose.Schema.Types.ObjectId, required: true, ref:'Account'},
         idProduct:{type: mongoose.Schema.ObjectId, required: true,ref:'Product'},
         size:String,
         number:Number,
