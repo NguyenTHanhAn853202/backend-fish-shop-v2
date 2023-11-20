@@ -57,7 +57,6 @@ class Statistics{
             }
             data.forEach((item,index)=>{
                 const key = handleKey(item.createdAt).toString()
-                console.log(list[key]);
                 if(list.hasOwnProperty(key))
                     list[key] += item.number*item.price
             })     

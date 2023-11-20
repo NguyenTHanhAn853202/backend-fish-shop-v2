@@ -26,6 +26,7 @@ class CartController {
     }
 
     async updateInCart(req,res,next) {
+        const {id=null} = req.body
         const result = []
         const cartUpdate = Array.isArray(req.body.cartUpdate)?req.body.cartUpdate : [] 
         await cartUpdate.forEach(item=>{
@@ -37,7 +38,7 @@ class CartController {
                    return  res.send('error')
                 })
         })
-        const data =await Cart.find().populate('idProduct')
+        const data =await Cart.find({userID:id}).populate('idProduct')
         return res.status(200).json({
             title:'success',
             success:true,
@@ -62,7 +63,7 @@ class CartController {
             { upsert: true, returnOriginal: false }
         ).populate('idProduct')
            
-        const totalData =await Cart.find().populate('idProduct')
+        const totalData =await Cart.find({userID:id}).populate('idProduct')
         return  res.status(200).json({
                     title:'success',
                     success:true,
