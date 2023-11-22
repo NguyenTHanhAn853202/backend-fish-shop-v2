@@ -1,3 +1,4 @@
+const BillAtStore = require('../../models/BillAtStore');
 const Bought = require('../../models/Bought');
 const BoughtAtStore = require('../../models/BoughtAtStore');
 const Inventory = require('../../models/Inventory');
@@ -172,19 +173,58 @@ class BoughtController {
 
     async boughtAtStore(req, res, next) {
         try {
-            const {idProduct,nameProduct,name,phoneNumber,address,price,number,billId,itemId} = req.body
-            const newBoughtAtStore = new BoughtAtStore({idProduct,nameProduct,name,phoneNumber,address,price,number})
-            const data = await newBoughtAtStore.save()
-            await Product.updateOne({_id:idProduct},{$inc:{number:-number}})
-            await exportBill.updateOne({billId,itemId,price,name:nameProduct},{$inc:{number:number}},{upsert:true})
-            await Inventory.updateOne({billId,itemId},{$inc:{number:-number}})
-            res.status(200).json({
-                title:'bought at store',
-                success:true,
-                data
+            const {billId,customerName,phoneNumber,address,products,number} = req.body
+            const bill = new BillAtStore({billId,name:customerName,phoneNumber,address})
+            const dataBill = await bill.save()
+            if(!dataBill){
+                return res.status(200).json({
+                    success: false,
+                    // data:data,
+                    
+                })
+            }
+            const boughts = []
+            for(let i = 0; i < products.length; i++) {
+                const bought = new BoughtAtStore({billId:billId,nameProduct:products[i].name,
+                    idProduct:products[i]._id,price:products[i].price,number:number[i]})
+                await bought.save()
+                await Product.updateOne({_id:products[i]._id},{$inc:{number:-number[i]}})
+                await exportBill.updateOne({billId:products[i].billId,itemId:products[i].itemId,price:products[i].price,name:products[i].name},{$inc:{number:number[i]}},{upsert:true})
+                await Inventory.updateOne({billId:products[i].billId,itemId:products[i].itemId},{$inc:{number:-number[i]}})
+                boughts.push(bought.save())
+            }
+            const data = await Promise.all(boughts)
+            if(data.length){
+                return res.status(200).json({
+                    success: true,
+                    data:data,
+
+                })
+
+            }
+            return res.status(200).json({
+                success: false,
+                data:data,
+                
             })
+            // const newBoughtAtStore = new BoughtAtStore({idProduct,nameProduct,price,number})
+            // const data = await newBoughtAtStore.save()
+            // await Product.updateOne({_id:idProduct},{$inc:{number:-number}})
+            // await exportBill.updateOne({billId,itemId,price,name:nameProduct},{$inc:{number:number}},{upsert:true})
+            // await Inventory.updateOne({billId,itemId},{$inc:{number:-number}})
+            // res.status(200).json({
+            //     title:'bought at store',
+            //     success:true,
+            //     data
+            // })
         } catch (error) {
             console.log(error);
+            if(error.code === 11000){
+                res.status(400).json({
+                    success:false,
+                    message:'Mã đơn hàng đã tồn tại'
+                })
+            }
         }
     }
 }
