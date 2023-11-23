@@ -227,6 +227,30 @@ class BoughtController {
             }
         }
     }
+
+    async getBillAtStore(req, res, next) {
+        try {
+            const data = await BillAtStore.find()
+            res.status(200).json({
+                success: true,
+                data: data
+            })
+        } catch (error) {
+            
+        }
+    }
+    async getDetailBill(req, res) {
+        try {
+            const billId = req.query?.billId
+            const data = await BoughtAtStore.find({billId})
+            res.status(200).json({
+                success: true,
+                data: data
+            })
+        } catch (error) {
+            
+        }
+    }
 }
 
 module.exports = new BoughtController()

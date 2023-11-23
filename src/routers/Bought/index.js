@@ -12,7 +12,8 @@ router.post('/list-bought',authenToken,employee,Bought.boughtList)
 router.post('/update-status',authenToken,employee,Bought.updateStatus)
 
 router.post('/bought-at-store',Bought.boughtAtStore)
-
+router.get('/get-bill-at-store',Bought.getBillAtStore)
+router.get('/get-detail-bill',Bought.getDetailBill)
 
 // statistic
 
