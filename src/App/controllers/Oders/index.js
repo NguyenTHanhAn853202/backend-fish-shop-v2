@@ -20,7 +20,7 @@ class OderController {
             const toName = req.body?.toName
             const toPhoneNumber = req.body?.toPhoneNumber
             const toSpecificAddress = req.body?.toSpecificAddress
-            const note = req.body?.node
+            const note = req.body?.note
             const address = req.body?.address
             if(!Array.isArray(infoOfOder) && infoOfOder?.length>0) {
                 return res.json({title:'error',message:"oder's information is not array",success:false})
@@ -45,7 +45,7 @@ class OderController {
             }
             
             await Cart.deleteMany({ _id: { $in: infoOfOder.map(item => item._id) } });
-            const cart = await Cart.find().populate('idProduct')
+            const cart = await Cart.find({userID}).populate('idProduct')
                 return res.status(200).json({
                     title:'success',
                     success:true,

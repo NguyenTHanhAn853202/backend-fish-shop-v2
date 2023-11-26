@@ -186,7 +186,7 @@ class BoughtController {
             const boughts = []
             for(let i = 0; i < products.length; i++) {
                 const bought = new BoughtAtStore({billId:billId,nameProduct:products[i].name,
-                    idProduct:products[i]._id,price:products[i].price,number:number[i]})
+                    idProduct:products[i]._id,price:products[i].price,number:number[i],name:customerName})
                 await bought.save()
                 await Product.updateOne({_id:products[i]._id},{$inc:{number:-number[i]}})
                 await exportBill.updateOne({billId:products[i].billId,itemId:products[i].itemId,price:products[i].price,name:products[i].name},{$inc:{number:number[i]}},{upsert:true})
